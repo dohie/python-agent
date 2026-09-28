@@ -15,7 +15,7 @@ def call_agent(client, messages, args, user_prompt):
 
         if args.verbose:
             print(f"\nUser prompt: {user_prompt}\nPrompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}")
-            print(f"\nReasoning: {message.reasoning_content}")
+            print(f"\nReasoning: {message.reasoning_content}\n====================================================================================================")
 
         messages.append(message)
 

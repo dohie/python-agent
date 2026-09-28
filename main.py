@@ -7,9 +7,12 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from config import system_prompt
 
-
 load_dotenv()
-api_key=os.environ.get("OPENROUTER_API_KEY")
+base_url = os.environ.get("OPENAI_BASE_URL")
+if not base_url:
+    raise RuntimeError("API URL not found")
+
+api_key = os.environ.get("OPENROUTER_API_KEY")
 if not api_key:
     raise RuntimeError("API key not found")
 
@@ -20,13 +23,16 @@ parser.add_argument("--verbose", action="store_true", help="Enable verbose outpu
 args = parser.parse_args()
 
 client = OpenAI(
-    base_url="http://ai.bigdoh.org/api/v1",
+    base_url=base_url,
     api_key=api_key,
 )
 
 def get_user_prompt() -> str:
     print("Enter prompt below:")
-    return str(input())
+    prompt = ""
+    while prompt == "":
+        prompt = str(input()).strip()
+    return prompt
 
 messages = [
     {"role": "system", "content": args.system},
