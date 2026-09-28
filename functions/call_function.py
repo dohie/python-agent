@@ -4,6 +4,7 @@ from functions.get_file_content import *
 from functions.write_file import *
 from functions.run_python_file import *
 from collections.abc import Callable
+from config import working_directory
 
 available_functions = [
 	schema_get_files_info,
@@ -35,7 +36,7 @@ def call_function(tool_call, verbose: bool = False) -> dict:
 			"content": f"Error: Unknown function: {function_name}",
 		}
 
-	function_args["working_directory"] = "./calculator"
+	function_args["working_directory"] = working_directory
 	result = function_map[function_name](**function_args)
 
 	return {

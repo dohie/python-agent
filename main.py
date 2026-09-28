@@ -1,11 +1,12 @@
 import os
+import sys
 import argparse
 import json
+from agent import call_agent
 from dotenv import load_dotenv
 from openai import OpenAI
-from prompts import system_prompt
-from functions.call_function import available_functions
-from functions.call_function import call_function
+from config import system_prompt
+
 
 load_dotenv()
 api_key=os.environ.get("OPENROUTER_API_KEY")
@@ -28,24 +29,4 @@ messages = [
     {"role": "user", "content": args.user_prompt},
 ]
 
-response = client.chat.completions.create(
-    model=args.model,
-    messages=messages,
-    tools=available_functions,
-)
-
-if args.verbose:
-    print(f"\nUser prompt: {args.user_prompt}\nPrompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}\n")
-
-message = response.choices[0].message
-
-if message.tool_calls:
-    for tool_call in message.tool_calls:
-        function_args = json.loads(tool_call.function.arguments or "{}")
-        result_message = call_function(tool_call, args.verbose)
-        if result_message["content"] == "":
-            raise Exception("Error: No result from tool call")
-        if args.verbose:
-            print(f"-> {result_message['content']}")
-else:
-    print(f"Response: \n{message.content}")
+sys.exit(call_agent(client, messages, args))

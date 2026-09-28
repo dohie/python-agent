@@ -1,0 +1,35 @@
+import json
+from openai import OpenAI
+from functions.call_function import available_functions
+from functions.call_function import call_function
+
+def call_agent(client, messages, args):
+    for _ in range(20):
+        response = client.chat.completions.create(
+            model=args.model,
+            messages=messages,
+            tools=available_functions,
+        )
+
+        if args.verbose:
+            print(f"\nUser prompt: {args.user_prompt}\nPrompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}")
+
+        message = response.choices[0].message
+        messages.append(message)
+
+        if message.tool_calls:
+            for tool_call in message.tool_calls:
+                function_args = json.loads(tool_call.function.arguments or "{}")
+                result_message = call_function(tool_call, args.verbose)
+                if result_message["content"] == "":
+                    raise Exception("Error: No result from tool call")
+                if args.verbose:
+                    print(f"-> {result_message['content']}")
+                messages.append(result_message)
+        else:
+            print(f"\nResponse: \n\n{message.content}")
+            break
+
+    if not message.content:
+        return "tool call limit exceeded"
+    return None
