@@ -16,3 +16,21 @@ def get_file_content(working_directory: str, file_path: str) -> str:
     except Exception as e:
         return f"Error encountered: {e}"
     return contents
+
+schema_get_file_content = {
+    "type": "function",
+    "function": {
+        "name": "get_file_content",
+        "description": "Returns the contents of the specified file, with a limit of 10,000 characters",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to the target file, relative to the working directory",
+                },
+            },
+            "required": ["file_path"],
+        },
+    },
+}
