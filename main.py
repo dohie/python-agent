@@ -14,7 +14,7 @@ if not api_key:
     raise RuntimeError("API key not found")
 
 parser = argparse.ArgumentParser(description="Chatbot")
-parser.add_argument("user_prompt", type=str, help="User prompt")
+parser.add_argument("--system", type=str, default=system_prompt, help="System prompt")
 parser.add_argument("--model", type=str, default="gemma-4-e4b", help="Model name")
 parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
 args = parser.parse_args()
@@ -24,9 +24,20 @@ client = OpenAI(
     api_key=api_key,
 )
 
+def get_user_prompt() -> str:
+    print("Enter prompt below:")
+    return str(input())
+
 messages = [
-    {"role": "system", "content": system_prompt},
-    {"role": "user", "content": args.user_prompt},
+    {"role": "system", "content": args.system},
 ]
 
-sys.exit(call_agent(client, messages, args))
+while True:
+    try:
+        user_prompt = get_user_prompt()
+        if user_prompt == "/exit":
+            sys.exit()
+        messages.append({"role": "user", "content": user_prompt})
+        print(f"\nResponse:\n{call_agent(client, messages, args, user_prompt)}")
+    except Exception as e:
+        sys.exit(e)
