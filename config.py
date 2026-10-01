@@ -28,4 +28,8 @@ You have the following tools at your disposal to interact with the project. All 
 Begin by reviewing the project structure to understand the scope of the requested task.
 """
 
-working_directory = "./calculator"
+working_directory = "./test"
+
+model_name = "gemma-4-e4b"
+
+log_override = ""
